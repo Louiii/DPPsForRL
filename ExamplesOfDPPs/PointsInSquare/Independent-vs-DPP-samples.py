@@ -36,12 +36,12 @@ def makeDV(n, sigma = 0.1):# kernel width
     return D, V, xf, yf
 
 def figure():
-    n, sigma = 60, 0.1
+    n, sigma = 80, 0.15
     D, V, xf, yf = makeDV(n, sigma)
     dpp = DPP(D, V)
 
     # sample
-    dpp_sample = dpp.sample()#k=200)
+    dpp_sample = dpp.sample(k=200)# OR dpp.sample()
     ind_sample = np.random.choice(range(n*n), len(dpp_sample), replace=False)#np.random.randint(n*n, size=len(dpp_sample))
 
     # PLOTTING

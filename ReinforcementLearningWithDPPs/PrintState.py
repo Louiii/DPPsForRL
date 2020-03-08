@@ -58,7 +58,8 @@ def plotMazePolicy(agents, bs, gx, gy, w, h, **kwargs):#show and save default to
     for i in range(7): plt.plot([i,i], [0,3], lw=0.5, alpha=0.5, c='grey')
     for i in range(4): plt.plot([0,8], [i,i], lw=0.5, alpha=0.5, c='grey')
 
-    if 'title' in kwargs: ax1.set_title(kwargs['title'])
+    if 'title' in kwargs and kwargs['title']!=None: 
+        ax1.set_title(kwargs['title'])
 
     onGoal = False
     # Shade and label agents
@@ -76,15 +77,14 @@ def plotMazePolicy(agents, bs, gx, gy, w, h, **kwargs):#show and save default to
     # for (x, y) in obstacles: 
     #     fill([x,x+1,x+1,x], [y,y,y+1,y+1], 'k', alpha=0.2, edgecolor='k')
     # for (x, y) in obstacles: 
-    if bs==3:
-        fill([4,7,7,4], [3,3,4,4], 'k', alpha=0.7, edgecolor='k')
-        fill([0,3,3,0], [3,3,4,4], 'k', alpha=0.7, edgecolor='k')
-    elif bs==0:
-        fill([4,7,7,4], [3,3,4,4], 'k', alpha=0.7, edgecolor='k')
-        fill([1,4,4,1], [3,3,4,4], 'k', alpha=0.7, edgecolor='k')
+    b1 = [4,7,7,4]
+    b2 = [0,3,3,0]
+    if bs==0:
+        b2 = [1,4,4,1]
     elif bs==6:
-        fill([3,6,6,3], [3,3,4,4], 'k', alpha=0.7, edgecolor='k')
-        fill([0,3,3,0], [3,3,4,4], 'k', alpha=0.7, edgecolor='k')
+        b1 = [3,6,6,3]
+    fill(b1, [3,3,4,4], 'k', alpha=0.55, edgecolor='k')
+    fill(b2, [3,3,4,4], 'k', alpha=0.55, edgecolor='k')
         
     bs = [1,5] if bs==3 else [2,5] if bs==0 else [1,4]
     for i, x in zip([1, 2], bs): 
