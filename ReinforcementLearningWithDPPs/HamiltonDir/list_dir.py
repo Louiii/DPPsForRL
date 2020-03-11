@@ -35,6 +35,16 @@ multip = {k:len(lst) for k,lst in multiples.items()}
 print('\n\n')
 print(multip)
 print()
-numas = [np.array(multiples[i])-i for i in range(28)]
-print(numas)
+numas1 = [np.array(multiples[i])-i for i in range(28)]
+
+numas2 = [(list(np.array(multiples[i])-i), str(list(np.array(multiples[i])-i))=='[100, 150, 200]') for i in range(28, 50)]
+n2a = [a for (a, b) in numas2 if b]
+n2b = [a for (a, b) in numas2 if not b]
+print(numas1)
+print('\n')
+print(n2a)
+print(len(n2a))
+print('\n')
+print(n2b)
+print(len(n2b))
 
