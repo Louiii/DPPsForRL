@@ -97,7 +97,7 @@ class DualDPP:
             
             # sample marginal
             if np.random.random() < marginal:
-                S[remaining] = i
+                S[rem] = i
                 rem -= 1
             i -= 1
         return list(map(int, np.sort(S)))
@@ -116,6 +116,7 @@ class DualDPP:
 
     def sample_dual(self, k=None):
         N = self.B.shape[1]
+        self.D, self.V = self.D_all, self.V_all
         if k == None:
             self.phase1()
             k = self.V.shape[1]
@@ -123,7 +124,6 @@ class DualDPP:
             J = self.k_dpp_phase1(k)
             cols = np.array([True if i in J else False for i in range(len(self.D))])
             self.makeV(cols)
-            print('cols: '+str(sum(cols)))
 
         # PHASE 2
         Y = np.zeros(k, dtype=int)

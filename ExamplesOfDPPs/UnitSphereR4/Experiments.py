@@ -139,31 +139,58 @@ def my_bar_example(histogram=None, repeats=1000):
                 x, y, z = zip(*[R4_to_R3(a, b, c, d) for (a,b,c,d) in abcd])
                 dists = [distance([x[i],y[i],z[i]], [x[j],y[j],z[j]]) for i in range(len(Y)) for j in range(i+1, len(Y))]
                 return np.mean(dists)
-
+            
+            def volumeR3(Y):
+                abcd = np.array(vectors)[list(Y)]
+                Vs = np.array([R4_to_R3(a, b, c, d) for (a,b,c,d) in abcd])
+                v, Vs = Vs[0, :], Vs[1:, :]
+                Vs -= v
+                return np.abs(np.linalg.det(Vs))
+            
+            def volumeR4(Y):
+                abcd = np.array(vectors)[list(Y)]
+                return np.abs(np.linalg.det(abcd))
+            
+            print('sampling DPP...')
             dpp = DualDPP(C, B)
             dppYs, indYs = [], []
             for _ in tqdm(range(repeats)):
                 dppYs.append( dpp.sample_dual(k=4) )
                 indYs.append( np.random.randint(0, len(vectors), 4) )
-
+            
+            print('computing R3 distances...')
             dpp_dists = [av_dist(Y) for Y in dppYs]
             ind_dists = [av_dist(Y) for Y in indYs]
-            
-            data = {'dpp': dpp_dists, 'ind':ind_dists}
-            export_dataset(data, "hist_data")
-
-        data = load_dataset("hist_data")
-        df = pd.DataFrame(data=data)
-
-        plt.figure(figsize=(8,6), dpi= 400)
-
-        sns.distplot(df['dpp'], color="dodgerblue", label="DPP", hist_kws={'alpha':.7}, kde_kws={'linewidth':1.5})
-        sns.distplot(df['ind'], color="g", label="Independent distances", hist_kws={'alpha':.7}, kde_kws={'linewidth':1.5})
-
-        plt.title('k-DPP (k=4) vs Independent samples,\naverage distances between 3D points', fontsize=16)
-        plt.legend()
-        plt.savefig('plots/histogram')
-        plt.show()
+            print('computing R3 volumes...')
+            dpp_volsR3 = [volumeR3(Y) for Y in dppYs]
+            ind_volsR3 = [volumeR3(Y) for Y in indYs]
+            print('computing R4 volumes...')
+            dpp_volsR4 = [volumeR4(Y) for Y in dppYs]
+            ind_volsR4 = [volumeR4(Y) for Y in indYs]
+            print('exporting datasets.')
+            export_dataset({'dpp': dpp_dists, 'ind':ind_dists}, "hist_dist_data")
+            export_dataset({'dpp': dpp_volsR3, 'ind':ind_volsR3}, "hist_R3_vol_data")
+            export_dataset({'dpp': dpp_volsR4, 'ind':ind_volsR4}, "hist_R4_vol_data")
+        print('plotting.')
+        fnames = ["hist_dist_data", "hist_R3_vol_data", "hist_R4_vol_data"]
+        titles = ['k-DPP (k=4) vs Independent samples,\naverage distances between 3D points',
+                  'k-DPP (k=4) vs Independent samples,\nvolume spanned by 3D points',
+                  'k-DPP (k=4) vs Independent samples,\nvolume spanned by 4D diversity vectors']
+        labels = ['dists.', 'vols.', 'vols.']
+        wnames = ['R3_dists', 'R3_vols', 'R4_vols']
+        limits = [[0.3, 1.4], [-0.1, 1.5], [-0.05, 0.6]]
+        for fname, title, l, wname, lms in zip(fnames, titles, labels, wnames, limits):
+            df = pd.DataFrame(data=load_dataset(fname))
+    
+            plt.figure()
+            sns.distplot(df['dpp'], bins=100, color="dodgerblue", label="DPP "+l, hist_kws={'alpha':.7}, kde_kws={'linewidth':1.5})
+            sns.distplot(df['ind'], bins=100, color="g", label="Indep. "+l, hist_kws={'alpha':.7}, kde_kws={'linewidth':1.5})
+    
+            plt.title(title, fontsize=16)
+            plt.legend()
+            plt.xlim(lms)
+            plt.savefig('plots/'+wname+'_histogram', dpi= 400)
+            plt.show()
 
 def export_dataset(data, name):
     with open('datasets/'+name+'.json', 'w') as outfile:
@@ -179,7 +206,7 @@ if __name__=="__main__":
     my_3D_fig()
     my_sphere_fig()
     my_bar_example()
-    # my_bar_example(histogram="simulate", repeats=10000)
+    my_bar_example(histogram="simulate", repeats=50000)
     my_bar_example(histogram="", repeats=10000)
 
 
