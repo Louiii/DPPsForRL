@@ -2,6 +2,7 @@ from MLE_QualityModel import *
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib as mpl
+import matplotlib.cm as cm
 from mpl_toolkits import mplot3d
 from matplotlib.ticker import MaxNLocator
 import itertools, collections
@@ -18,7 +19,7 @@ def plot_sample(filename, sample):
     plt.savefig('plots/'+filename, dpi=600)
     plt.show()
 
-def likelihood_heatmap(th1, th2, lkhd, filename, angle=0, vectors=None):
+def likelihood_heatmap(th1, th2, lkhd, filename, angle=0, vectors=None, adam=False):
     ax = plt.axes(projection='3d')
     ax.view_init(30, angle)
 
@@ -30,6 +31,9 @@ def likelihood_heatmap(th1, th2, lkhd, filename, angle=0, vectors=None):
         c = lengths/np.array(dx**2 + dy**2 + dz**2)
         dx, dy, dz = c*dx, c*dy, c*dz
         q = ax.quiver(x, y, z, dx, dy, dz, length=0.5, cmap='Reds', lw=1)
+        if adam:
+            lengths = np.ones(len(x))
+            lengths[-1] = 0
         q.set_array(lengths)
 
         lkhd /= 10000
@@ -86,7 +90,8 @@ for (th, dth) in grad:
    f1, f2 = Likelihood(samples, th), Likelihood(samples, th+dth)
    values.append((th[0], th[1], f1-mn, dth[0], dth[1], f2-f1))
 vectors = tuple(zip(*values))
-likelihood_heatmap(th1, th2, likelihood, 'likelihood_theta', angle=150, vectors=vectors)
+# likelihood_heatmap(th1, th2, likelihood, 'likelihood_theta', angle=150, vectors=vectors)
+likelihood_heatmap(th1, th2, likelihood, 'likelihood_theta', angle=150, vectors=vectors, adam=True)
 
 
 plot_sample('sample', samples[0])

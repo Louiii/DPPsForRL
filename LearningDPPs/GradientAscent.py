@@ -41,7 +41,7 @@ def dLhd_dtheta(theta, A):
     ''' Gradient of the likelihood wrt theta, 'A' is an array of samples '''
     return np.array([dLikelihood_dtheta_l(theta, A, l) for l in range(len(theta))])
 
-def gradientAscent(theta, A, m, batch_size=10, decay_start=20, alpha_0 = 1):
+def SGD(theta, A, m, batch_size=10, decay_start=20, alpha_0 = 1):
     grad = []
     for t in range(1, m+1):
         alpha = alpha_0 * min(1, (decay_start/t)**2)
@@ -53,6 +53,20 @@ def gradientAscent(theta, A, m, batch_size=10, decay_start=20, alpha_0 = 1):
         print((theta, t, alpha))
     return theta, grad
 
+def Adam(theta, A, n_iter, alpha=0.5, batch_size=10, beta_1=0.9, beta_2=0.999, epsilon=0.001):
+    m, v = np.zeros(len(theta))
+    grad = []
+    for t in range(1, n_iter+1):
+        As = A[np.random.randint(0, len(A), batch_size)]
+        g = dLhd_dtheta(theta, As)
+        m = beta_1 * m + (1 - beta_1) * g
+        v = beta_2 * v + (1 - beta_2) * np.power(g, 2)
+        m_hat = m / (1 - np.power(beta_1, t))
+        v_hat = v / (1 - np.power(beta_2, t))
+        theta += alpha * m_hat / (np.sqrt(v_hat) + epsilon)
+        grad.append((theta.copy(), (g/np.linalg.norm(g)).copy()))
+        print((theta, t, alpha))
+    return theta, grad
 
 n, sigma = 20, 0.2
 N = n*n
@@ -72,6 +86,10 @@ print('...generating samples')
 samples = [dpp.sample() for _ in tqdm(range(T))]
 
 
+# print('SGD:')
+# theta = np.array([10.,10.])
+# theta, grad = SGD(theta, np.array(samples), 100)
+print('Adam:')
 theta = np.array([10.,10.])
-theta, grad = gradientAscent(theta, np.array(samples), 100)
+theta, grad = Adam(theta, np.array(samples), 200)
 
