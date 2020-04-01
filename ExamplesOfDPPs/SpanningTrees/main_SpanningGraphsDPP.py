@@ -1,5 +1,5 @@
 from misc import makeGridGraph, plotter
-from scipy.linalg import qr
+from scipy.linalg import eigh
 import networkx as nx
 import numpy as np
 import time
@@ -7,8 +7,9 @@ import time
 from AldousBroder import AldousBroder
 from Wilson import Wilson
 from HKPV import USG
+
 import sys
-sys.path.append('../')
+sys.path.append('../../')
 from DPP import DPP
 
 
@@ -26,19 +27,18 @@ class SpanningGraphs:
 
     def compute_kernel(self):
         inc_mat = nx.incidence_matrix(self.g, oriented=False)
-        A = inc_mat[:-1, :].toarray()
-        self.kernel_eig_vecs, _ = qr(A.T, mode='economic')
+        A = inc_mat[1:, :].toarray()
+        #K=A^T[AA^T]^{-1}A
+        self.K = np.dot(A.T, np.dot(np.linalg.inv(np.dot(A, A.T)), A))
         self.edges = list(self.g.edges())
 
     def dpp(self):
         self.compute_kernel()
-        evs = np.copy(self.kernel_eig_vecs)
-        dpp = DPP(evs)
-        dpp_sample = dpp.sample()
+        dpp_ = DPP(*eigh(self.K))
+        Y = dpp_.sample(k=len(self.g.nodes)-1)
 
         sampl = nx.Graph()
-        sampl.add_edges_from([self.edges[e] for e in dpp_sample])
-
+        sampl.add_edges_from([self.edges[e] for e in Y])
         return sampl
 
     def HKPV(self):
@@ -46,7 +46,7 @@ class SpanningGraphs:
         return usg.sample()
 
 
-n = 15
+n = 10
 sg = SpanningGraphs(n)
 
 for fn in ["wilson", "aldousBroder", "dpp", "HKPV"]:

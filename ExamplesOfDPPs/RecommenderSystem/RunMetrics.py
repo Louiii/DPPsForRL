@@ -58,20 +58,6 @@ def novelty(item_pop_R):
     # compute log_2(popularity(item)) / len(list)
     return -sum(np.log2(item_pop_R))/len(item_pop_R)
 
-def catalogCoverage(rs, user, N=1500):
-    m = rs.m
-    
-    obs_items = set([])
-    coverage = np.zeros(N)
-    for i in tqdm(range(N)):
-        recs = rs.recommend(user, list(obs_items))
-        obs_items = obs_items.union(recs)
-        coverage[i] = len(obs_items)/m
-        print(coverage[i])
-    return coverage
-
-
-
 rs = MF(train=True)# train == True loads Y so that we can test it
 rs.load()
 
@@ -133,40 +119,40 @@ plt.legend()
 plt.savefig('PR', dpi=400)
 plt.show()
 
-###############################################################################
-###################           Catalog Coverage            #####################
-###############################################################################
-user, N = 0, 1500
-coverage = catalogCoverage(rs, user, N=N)
-
-plt.clf()
-plt.plot([i*10 for i in range(1, N+1)], coverage, 'c', label='SVD-PF')
-#plt.plot([i*10 for i in range(1, N+1)], coverage_tf, "#72246C", label='TF-DPP')
-plt.plot([rs.m, rs.m], [0, 1.05], 'r', label='Total number of items')
-plt.xlabel('Number of tracks recommended')
-plt.ylabel('Proportion of tracks seen')
-plt.ylim([0, 1.05])
-plt.legend()
-#plt.title('Catelog coverage')
-plt.savefig('CatalogCoverage', dpi=300)
-plt.show()
-
 
 ###############################################################################
 ###################                Novelty                #####################
 ###############################################################################
-N = 500
-user = 0
+N = 200
+N_recs = 8
 m = rs.m
+novDPP, divDPP, novIND, divIND = [],[],[],[]
+rs.generateDiversityVecs()
+n_users = 10
+c = 0
+for user in np.random.choice(range(rs.n), n_users, replace=False):
+	c+=1
+	print(str(c)+' of '+str(n_users))
+	obs_items = set([])
+	for i in tqdm(range(N)):
+	    recs = rs.recommendDPP(user, list(obs_items), N_recs)
+	    item_pop_R = rs.item_popularity[recs]
+	    novDPP.append(novelty(item_pop_R))
+	    divDPP.append(np.mean([np.dot(rs.diversity[recs[a], :], rs.diversity[recs[b], :]) for a in range(N_recs) for b in range(a)]))
 
-obs_items = set([])
-nov = np.zeros(N)
-for i in tqdm(range(N)):
-    recs = rs.recommend(user, list(obs_items))
-    item_pop_R = rs.item_popularity[recs]
-    nov[i] = novelty(item_pop_R)
-#    print(nov[i])
-print(np.mean(nov))# 8.29
-print(np.std(nov))# 0.658
+	obs_items = set([])
+	for i in tqdm(range(N)):
+	    recs = rs.recommendIndep(user, list(obs_items), N_recs)
+	    item_pop_R = rs.item_popularity[recs]
+	    novIND.append(novelty(item_pop_R))
+	    divIND.append(np.mean([np.dot(rs.diversity[recs[a], :], rs.diversity[recs[b], :]) for a in range(N_recs) for b in range(a)]))
+
+print("Novelty:")
+print("DPP: Mean: "+str(np.mean(novDPP))+", std dev: "+str(np.std(novDPP)))
+print("IND: Mean: "+str(np.mean(novIND))+", std dev: "+str(np.std(novIND)))
+
+print("Diversity:")
+print("DPP: Mean: "+str(np.mean(divDPP))+", std dev: "+str(np.std(divDPP)))
+print("IND: Mean: "+str(np.mean(divIND))+", std dev: "+str(np.std(divIND)))
     
     

@@ -108,8 +108,8 @@ def compute_snd_devs(rec_reward):
     return yerr
 
 def plotMultiple(data, mask=None, fn='all_algorithms'):
-    plot_data = {}
-    for algo, (path,c) in data.items():
+    plot_data = []
+    for algo, (n,path,c) in data.items():
         with open(path, 'r') as f:
             rec_reward = json.load(f)
         if 'yerr' in rec_reward:
@@ -126,23 +126,24 @@ def plotMultiple(data, mask=None, fn='all_algorithms'):
             [xs, ys] = list(zip(*reward_av))
             xs, ys, yerr = np.array(xs), np.array(ys), np.array(yerr)
             if mask is not None:
-                m = [i for i in range(len(xs)) if i%3==0]
+                m = [i for i in range(len(xs)) if i%5==0]
                 xs, ys, yerr = xs[m], ys[m], yerr[m]
-        plot_data[algo] = [np.array(xs), np.array(ys), np.array(yerr), c]
-
-    plt.plot([0, 30], [OPTIMAL_SCORE, OPTIMAL_SCORE], c='g', lw=0.5, label='Optimal')
+        plot_data.append([algo, n, np.array(xs), np.array(ys), np.array(yerr), c])
+    plt.figure(figsize=(7,5))
+    plt.plot([0, 30], [OPTIMAL_SCORE, OPTIMAL_SCORE], c='g', lw=0.7, label='Optimal')
 
     # cols = [PALATINATE, 'r', 'm', 'c', 'lightgreen', 'b'] + list(mcolors.CSS4_COLORS)
     shift = 0
-    for algo, [xs, ys, yerr, c] in plot_data.items():
+    plot_data = sorted(plot_data, key=lambda x:x[1])
+    for (algo, n, xs, ys, yerr, c) in plot_data:
         mask = xs<320000
         xs, ys, yerr = xs[mask], ys[mask], yerr[mask]
-        plt.errorbar(xs/10000+shift, ys, yerr=yerr, c=c, lw=0.5, label=algo)
+        plt.errorbar(xs/10000+shift, ys, yerr=yerr, c=c, lw=0.7, label=algo)
         shift -= 0.02
 
     plt.ylim([-1.05,-0.55])
     plt.legend(loc='lower right')
-    plt.title('Algorithm comparison on the blocker task')
+    # plt.title('Algorithm comparison on the blocker task')
     plt.xlabel('Number of actions taken $\\times$ 10000')
     plt.ylabel('Average reward per action')
     plt.savefig('plots/'+fn, dpi=700)
@@ -170,19 +171,21 @@ if __name__ == '__main__':
     repeats = 10
     simulate(repeats, env, to_simulate)
 
-    # TESTING MODEL BASED:
-    data = {'Actor-Critic':(path1, 'm'),'detSarsaModelMean':(path2, PALATINATE), 'sarsaNoBoltzStepMean':(path5, 'r')}
-    plotMultiple(data, fn='model_comparison')
+    # # TESTING MODEL BASED:
+    # data = {'Actor-Critic':(path1, 'm'),'detSarsaModelMean':(path2, PALATINATE), 'sarsaNoBoltzStepMean':(path5, 'r')}
+    # plotMultiple(data, fn='model_comparison')
 
 
-    SilverHessTeh = {'ENATDAC':(p+'HessSilverTeh/ENATDAC-plot-data.json', 'c'),
-                     'EQNAC':(p+'HessSilverTeh/EQNAC-plot-data.json', 'b'),
-                     'NN':(p+'HessSilverTeh/NN-plot-data.json', 'm'),
-                     'ESARSA':(p+'HessSilverTeh/ESARSA-plot-data.json', 'r')}
+    SilverHessTeh = {'ENATDAC':(3, p+'HessSilverTeh/ENATDAC-plot-data.json', 'c'),
+                     'EQNAC':(4, p+'HessSilverTeh/EQNAC-plot-data.json', 'b'),
+                     'NN':(5, p+'HessSilverTeh/NN-plot-data.json', 'm'),
+                     'ESARSA':(6, p+'HessSilverTeh/ESARSA-plot-data.json', 'chartreuse')}
     data = {}
-    data.update({'DetSARSA-Model1':(path2, PALATINATE)})#, 'detSarsaNNModelMean':path4})
+    # (bi, bf, es, ec): 1: (2, 5e4, 5e4, 3e-3), 2: (20, 2e4, 4e4, 5e-4)
+    data.update({'MDet-SARSA 1':(1, '../HamiltonDir/data/d343.json', PALATINATE)})#{'DetSARSA-Model1':(path2, PALATINATE)})#, 'detSarsaNNModelMean':path4})
+    data.update({'MDet-SARSA 2':(2, '../HamiltonDir/data/d886.json', 'r')})
     data.update(SilverHessTeh)
-    plotMultiple(data, fn='hess_comparison')
+    plotMultiple(data, fn='hess_comparison', mask=True)
 
 
 

@@ -43,6 +43,7 @@ def find_index4params(params):
         prms.append(int(arr[i]) if arr[i]%1==0 else arr[i])
     return lookup_dict[str(prms)]
 
+# print(find_index4params((2.0, 50000, 50000, 0.003)))
 
 d_simp = {}
 mxx = ((beta_init[0], beta_frac[0], eta_start[0], eta_const[0]), -1)

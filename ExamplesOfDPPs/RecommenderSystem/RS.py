@@ -138,39 +138,54 @@ class MF:
                 losses = []
                 if t%(print_time*10)==0: self.save(UM=True)
 
-    def recommend(self, user, obs_items):
+    def generateDiversityVecs(self):
+        self.diversity = np.array([self.M[j, :]/np.linalg.norm(self.M[j, :]) for j in range(self.M.shape[0])])
+
+    def recommendDPP(self, user, obs_items, n_recs):
         ''' 
         data required: 
-                dict: item -> popularity_normalised, dict: user -> unobserved items (observed in a test set)            
-        predictions = generate r_ui for all i
-        filter out already observed ones?
-        
-        compose final recommendation list based on:
-            predicted ratings, popularity, diverse items 
+            arr: item -> popularity_normalised        
+            arr: predictions = generate r_ui for all i
+            mat: diversity vectors for all items
         '''
         un_obs_items = list(set(list(range(self.m))) - set(obs_items))
         base_Y, selection = np.array(un_obs_items), []
         if len(obs_items) > 0:
-            selection = np.random.choice(obs_items, min(10, len(obs_items)), replace=False)
+            selection = np.random.choice(obs_items, min(n_recs, len(obs_items)), replace=False)
             base_Y = np.append(base_Y, selection)
         ''' quality is a function of user-context-item '''
-        print('Producing data for DPP...')
-        quality = np.array([self.F(user, j) + self.item_popularity[j] for j in base_Y])
+        quality = np.array([self.F(user, j)*self.item_popularity[j] for j in base_Y])
         mask = quality > 0# remove any with q < 0
         quality = quality[mask]
         ''' quality is a function of the latent space of items '''
-        diversity = np.array([quality[i] * self.M[j, :]/np.linalg.norm(self.M[j, :]) for i, j in enumerate(base_Y[mask])])
+        B = np.array([quality[i] * self.diversity[j, :] for i, j in enumerate(base_Y[mask])])
         # --> sample dual dpp
-        C = np.dot(diversity.T, diversity)
-        print('Sampling DPP...')
-        dpp = DualDPP(C, diversity.T)
-        selected_items = list( dpp.sample_dual(k=10) )
-        print("Done.")
+        C = np.dot(B.T, B)
+        dpp = DualDPP(C, B.T)
+        selected_items = list( dpp.sample_dual(k=n_recs) )
+        return selected_items
+    
+    def recommendIndep(self, user, obs_items, n_recs):
+        ''' 
+        data required: 
+            arr: item -> popularity_normalised        
+            arr: predictions = generate r_ui for all i
+        '''
+        un_obs_items = list(set(list(range(self.m))) - set(obs_items))
+        base_Y, selection = np.array(un_obs_items), []
+        if len(obs_items) > 0:
+            selection = np.random.choice(obs_items, min(n_recs, len(obs_items)), replace=False)
+            base_Y = np.append(base_Y, selection)
+        ''' quality is a function of user-context-item '''
+        quality = np.array([self.F(user, j)*self.item_popularity[j] for j in base_Y])
+        mask = quality > 0# remove any with q < 0
+        quality, base_Y = quality[mask], base_Y[mask]
+        selected_items = np.random.choice(base_Y, n_recs, p=quality/sum(quality), replace=False)
         return selected_items
 
 #rs = MF(train=True)
 #rs.train()
         
 #rs = MF()
-#print(rs.recommend(0, list(range(30))))
+#print(rs.recommendDPP(0, list(range(30))))
 

@@ -41,7 +41,8 @@ def figure():
     dpp = DPP(D, V)
 
     # sample
-    dpp_sample = dpp.sample(k=200)# OR dpp.sample()
+    dpp_sample = dpp.sample()
+    # dpp_sample = dpp.sample(k=200)
     ind_sample = np.random.choice(range(n*n), len(dpp_sample), replace=False)#np.random.randint(n*n, size=len(dpp_sample))
 
     # PLOTTING

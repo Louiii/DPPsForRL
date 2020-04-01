@@ -10,7 +10,8 @@
 ├── ExamplesOfDPPs
 │   ├── PointsInSquare
 │   ├── SpanningTrees
-│   └── UnitSphereR4
+│   ├── UnitSphereR4
+│   └── RecommenderSystem
 ├── InteractivePrograms
 ├── LearningDPPs
 └── ReinforcementLearningWithDPPs
