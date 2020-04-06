@@ -78,7 +78,7 @@ likelihood = np.zeros((n1, n2))
 for i in range(n1):
 	for j in range(n2):
 		theta = np.array([th1[i], th2[j]])
-		likelihood[i][j] = Likelihood(samples, theta)
+		likelihood[i][j] = logLikelihood(samples, theta)
 mn = np.min(likelihood)
 likelihood -= mn
 
@@ -87,7 +87,7 @@ from GradientAscent import *
 
 values = []
 for (th, dth) in grad:
-   f1, f2 = Likelihood(samples, th), Likelihood(samples, th+dth)
+   f1, f2 = logLikelihood(samples, th), logLikelihood(samples, th+dth)
    values.append((th[0], th[1], f1-mn, dth[0], dth[1], f2-f1))
 vectors = tuple(zip(*values))
 # likelihood_heatmap(th1, th2, likelihood, 'likelihood_theta', angle=150, vectors=vectors)

@@ -14,7 +14,7 @@ def L_At(At, theta):# L(At|theta)
 	qs = np.array([ q(i, theta) for i in At])
 	return np.multiply( K[np.ix_(At, At)], np.outer( qs, qs ) )
 
-def Likelihood(A, theta):# log likelihood function for a standard DPP (not k-DPP!)
+def logLikelihood(A, theta):# log likelihood function for a standard DPP (not k-DPP!)
 	T = len(A)
 	term1 = -T*np.log(np.linalg.det( L(theta) + np.eye(N) ))
 	term2 = np.sum([np.log(np.linalg.det( L_At(At, theta) )) for At in A])
@@ -42,6 +42,6 @@ samples = [dpp.sample() for _ in tqdm(range(T))]
 
 # learn theta which maximises the likelihood function.
 print('...learning theta from data')
-neg_likelihood = lambda theta: -Likelihood(samples, theta)
+neg_likelihood = lambda theta: -logLikelihood(samples, theta)
 theta_estimate = minimize(neg_likelihood, np.array([2, 2]), method='nelder-mead', options={'xatol': 1e-8, 'disp': True})
 print(theta_estimate.x)

@@ -31,7 +31,7 @@ def dL_At_dtheta_l(At, l, theta):
     fq = np.outer( fs, qs )
     return np.multiply( K[np.ix_(At, At)], fq+fq.T )
 
-def dLikelihood_dtheta_l(theta, A, l):
+def dlogLikelihood_dtheta_l(theta, A, l):
     ''' Gradient of the likelihood wrt theta_l'''
     term1 = np.sum([np.trace(np.dot(np.linalg.inv(L_At(At, theta)), dL_At_dtheta_l(At, l, theta))) for At in A])
     term2 = len(A)*np.trace(np.dot(np.linalg.inv(L(theta)+np.eye(N)), dL_dtheta_l(l, theta)))
@@ -39,7 +39,7 @@ def dLikelihood_dtheta_l(theta, A, l):
 
 def dLhd_dtheta(theta, A):
     ''' Gradient of the likelihood wrt theta, 'A' is an array of samples '''
-    return np.array([dLikelihood_dtheta_l(theta, A, l) for l in range(len(theta))])
+    return np.array([dlogLikelihood_dtheta_l(theta, A, l) for l in range(len(theta))])
 
 def SGD(theta, A, m, batch_size=10, decay_start=20, alpha_0 = 1):
     grad = []

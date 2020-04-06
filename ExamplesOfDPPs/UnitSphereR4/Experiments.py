@@ -145,18 +145,19 @@ def my_bar_example(histogram=None, repeats=1000):
                 Vs = np.array([R4_to_R3(a, b, c, d) for (a,b,c,d) in abcd])
                 v, Vs = Vs[0, :], Vs[1:, :]
                 Vs -= v
-                return np.abs(np.linalg.det(Vs))
+                return np.sqrt(np.abs(np.linalg.det(Vs.dot(Vs.T))))
             
             def volumeR4(Y):
-                abcd = np.array(vectors)[list(Y)]
-                return np.abs(np.linalg.det(abcd))
+                By = B[:, list(Y)]
+                # abcd = np.array(vectors)[list(Y)]
+                return np.sqrt(np.abs(np.linalg.det(By.T.dot(By))))
             
             print('sampling DPP...')
             dpp = DualDPP(C, B)
             dppYs, indYs = [], []
             for _ in tqdm(range(repeats)):
                 dppYs.append( dpp.sample_dual(k=4) )
-                indYs.append( np.random.randint(0, len(vectors), 4) )
+                indYs.append( np.random.choice(range(len(vectors)), 4, replace=False) )
             
             print('computing R3 distances...')
             dpp_dists = [av_dist(Y) for Y in dppYs]
@@ -178,13 +179,13 @@ def my_bar_example(histogram=None, repeats=1000):
                   'k-DPP (k=4) vs Independent samples,\nvolume spanned by 4D diversity vectors']
         labels = ['dists.', 'vols.', 'vols.']
         wnames = ['R3_dists', 'R3_vols', 'R4_vols']
-        limits = [[0.3, 1.4], [-0.1, 1.5], [-0.05, 0.6]]
+        limits = [[0.3, 1.4], [-0.01, 1.4], [-0.01, 0.6]]
         for fname, title, l, wname, lms in zip(fnames, titles, labels, wnames, limits):
             df = pd.DataFrame(data=load_dataset(fname))
     
             plt.figure()
-            sns.distplot(df['dpp'], bins=100, color="dodgerblue", label="DPP "+l, hist_kws={'alpha':.7}, kde_kws={'linewidth':1.5})
-            sns.distplot(df['ind'], bins=100, color="g", label="Indep. "+l, hist_kws={'alpha':.7}, kde_kws={'linewidth':1.5})
+            sns.distplot(df['dpp'], bins=200, color="dodgerblue", label="DPP "+l, hist_kws={'alpha':.7}, kde_kws={'linewidth':1.5})
+            sns.distplot(df['ind'], bins=200, color="g", label="Indep. "+l, hist_kws={'alpha':.7}, kde_kws={'linewidth':1.5})
     
             plt.title(title, fontsize=16)
             plt.legend()
@@ -208,6 +209,5 @@ if __name__=="__main__":
     my_bar_example()
     my_bar_example(histogram="simulate", repeats=50000)
     my_bar_example(histogram="", repeats=10000)
-
 
 
