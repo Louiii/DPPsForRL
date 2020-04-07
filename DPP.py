@@ -122,7 +122,7 @@ class DualDPP:
             k = self.V.shape[1]
         else:
             J = self.k_dpp_phase1(k)
-            cols = np.array([True if i in J else False for i in range(len(self.D))])
+            cols = np.array([i in J for i in range(len(self.D))])
             self.makeV(cols)
 
         # PHASE 2

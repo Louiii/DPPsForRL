@@ -11,25 +11,25 @@ q = lambda i, theta: np.dot( f(i), theta )
 
 def L(theta):
 	qs = np.array([ q(i, theta) for i in baseY])
-	return np.multiply( K, np.outer( qs, qs ) )
+	return np.multiply( S, np.outer( qs, qs ) )
 
 def L_At(At, theta):# L(At|theta)
 	qs = np.array([ q(i, theta) for i in At])
-	return np.multiply( K[np.ix_(At, At)], np.outer( qs, qs ) )
+	return np.multiply( S[np.ix_(At, At)], np.outer( qs, qs ) )
 
 def dL_dtheta_l(l, theta):
     ''' The gradient of L with repect to the l^th parameter in theta '''
     fs = np.array([ f(i)[l] for i in baseY])
     qs = np.array([ q(i, theta) for i in baseY])
     fq = np.outer( fs, qs )
-    return np.multiply( K, fq+fq.T )
+    return np.multiply( S, fq+fq.T )
 
 def dL_At_dtheta_l(At, l, theta):
     ''' The gradient of L_At with repect to the l^th parameter in theta '''
     fs = np.array([ f(i)[l] for i in At])
     qs = np.array([ q(i, theta) for i in At])
     fq = np.outer( fs, qs )
-    return np.multiply( K[np.ix_(At, At)], fq+fq.T )
+    return np.multiply( S[np.ix_(At, At)], fq+fq.T )
 
 def dlogLikelihood_dtheta_l(theta, A, l):
     ''' Gradient of the likelihood wrt theta_l'''
@@ -76,7 +76,7 @@ baseY = list(range(N))
 
 stack_xf, stack_yf = np.array([xf,]*N), np.array([yf,]*N)
 M = np.square( (stack_xf.T - stack_xf) ) + np.square( (stack_yf.T - stack_yf) )
-K = np.exp(-M/sigma**2)
+S = np.exp(-M/sigma**2)
 
 
 

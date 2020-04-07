@@ -8,11 +8,11 @@ import numpy as np
 
 def L(theta):
 	qs = np.array([ q(i, theta) for i in baseY])
-	return np.multiply( K, np.outer( qs, qs ) )
+	return np.multiply( S, np.outer( qs, qs ) )
 
 def L_At(At, theta):# L(At|theta)
 	qs = np.array([ q(i, theta) for i in At])
-	return np.multiply( K[np.ix_(At, At)], np.outer( qs, qs ) )
+	return np.multiply( S[np.ix_(At, At)], np.outer( qs, qs ) )
 
 def logLikelihood(A, theta):# log likelihood function for a standard DPP (not k-DPP!)
 	T = len(A)
@@ -29,7 +29,7 @@ baseY = list(range(N))
 
 stack_xf, stack_yf = np.array([xf,]*N), np.array([yf,]*N)
 M = np.square( (stack_xf.T - stack_xf) ) + np.square( (stack_yf.T - stack_yf) )
-K = np.exp(-M/sigma**2)
+S = np.exp(-M/sigma**2)
 
 
 f = lambda i: np.array([ xf[i], yf[i] ])

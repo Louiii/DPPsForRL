@@ -2,7 +2,6 @@ import sys
 sys.path.append('../')
 from DPP import DPP
 from scipy.linalg import eigh
-from scipy.optimize import minimize
 from tqdm import tqdm
 import numpy as np
 from numpy.linalg import det
@@ -11,36 +10,17 @@ import matplotlib.pyplot as plt
 
 def L(theta):
 	qs = np.array([ q(i, theta) for i in baseY])
-	return np.multiply( K, np.outer( qs, qs ) )
+	return np.multiply( S, np.outer( qs, qs ) )
 
 def L_At(At, theta):# L(At|theta)
 	qs = np.array([ q(i, theta) for i in At])
-	return np.multiply( K[np.ix_(At, At)], np.outer( qs, qs ) )
+	return np.multiply( S[np.ix_(At, At)], np.outer( qs, qs ) )
 
 def logLikelihood(A, theta):# log likelihood function for a standard DPP (not k-DPP!)
 	T = len(A)
 	term1 = -T*np.log(det( L(theta) + np.eye(N) ))
 	term2 = np.sum([np.log(det( L_At(At, theta) )) for At in A])
 	return term1 + term2
-
-def lk_ratio(th1, th2, A):
-	T = len(A)
-	fctr = det( L(th2) + np.eye(N) ) / det( L(th1) + np.eye(N) )
-	prod = 1
-	for At in A:
-		print(prod)
-		prod *= fctr * det( L_At(At, th1) ) / det( L_At(At, th2) )
-	return prod
-
-# def likelihood(A, theta):
-# 	T = len(A)
-# 	denom = det( L(theta) + np.eye(N) )
-# 	prod = 1
-# 	for At in A:
-# 		print(prod)
-# 		prod *= det( L_At(At, theta) ) / denom
-# 	return prod
-
 
 n, sigma = 20, 0.2
 N = n*n
@@ -50,13 +30,13 @@ baseY = list(range(N))
 
 stack_xf, stack_yf = np.array([xf,]*N), np.array([yf,]*N)
 M = np.square( (stack_xf.T - stack_xf) ) + np.square( (stack_yf.T - stack_yf) )
-K = np.exp(-M/sigma**2)
+S = np.exp(-M/sigma**2)
 
 
 fx = lambda i: np.array([ xf[i], yf[i] ])
 q = lambda i, theta: np.dot( fx(i), theta )
 
-theta_true, T = np.array([4.1, 0.76]), 100
+theta_true, T = np.array([4.1, 0.76]), 200
 dpp = DPP(*eigh(L(theta_true)))
 print('...generating samples')
 samples = [dpp.sample() for _ in tqdm(range(T))]
@@ -64,42 +44,44 @@ samples = [dpp.sample() for _ in tqdm(range(T))]
 
 
 
-
-
 unif = np.random.uniform
 
-T = 1000
+T = 10000
 
 f = lambda th: logLikelihood(samples, th)
 g = lambda x: np.random.normal(x, 0.1)#np.array([unif(2, 5), unif(0.5, 1)])
+# g is our proposal (or prior) because we consider only consider the ratio
+# of g(z|xt) to g(xt|z) and because the normal dist. is symmetric we can 
+# ignore it from the ratio.
 
-r = lambda th1,th2: lk_ratio(th1, th2, samples)
+def r(th1, th2):
+	logdiff = logLikelihood(samples, th1) - logLikelihood(samples, th2)
+	return np.exp(logdiff)
 
-
-x0 = np.array([4, 0.8])
-
-x = []
-xt = x0
-accept = 0
-for i in tqdm(range(T)):
-	z = g(xt)
-	# print('likelihoods:  '+str(f(z))+', '+str(f(xt)))
-	# alpha = min(f(z)/f(xt), 1)
-	alpha = min(r(z,xt), 1)
-	u = unif()
-	if u < alpha:
-		x.append(z)
-		xt = z
-		accept += 1
-	else:
+def MH(x0):
+	x = []
+	xt = x0
+	accept = 0
+	for i in tqdm(range(T)):
+		z = g(xt)
+		alpha = min(r(z, xt), 1)
+		if unif() < alpha:
+			xt = z
+			accept += 1
 		x.append(xt)
+	print('Acceptance rate: '+str(accept/T))
+	return x
 
-x, y = zip(*x)
+x0 = np.array([8, 3])
+samples = MH(x0)
+x, y = zip(*samples)
 
-print('Acceptance rate: '+str(accept/T))
-plt.hist2d(x, y, bins=20)
+plt.hist2d(x[200:], y[200:], bins=26)
+plt.colorbar()
+plt.savefig('plots/mh_hist', dpi=400)
 plt.show()
+plt.clf()
 
-pylab.title("Random Walk ($n = " + str(T) + "$ steps)") 
 pylab.plot(x[-10000:], y[-10000:], lw=0.4, c='c') 
+pylab.savefig('plots/random_walk', dpi=400)
 pylab.show() 
