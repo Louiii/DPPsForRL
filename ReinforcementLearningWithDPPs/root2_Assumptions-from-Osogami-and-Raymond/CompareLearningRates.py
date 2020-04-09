@@ -184,15 +184,16 @@ def zoomedPlot(data, osogami=True, all_runs=True, errBar=True, fname="zoomedLear
             others = [list(zip(*rec_)) for rec_ in recs]
             col = cols.pop(0)
             for i, [x, y] in enumerate(others):
+                x = np.array(x)/1000
                 if i==0:
-                    plt.plot(x, y, c=col, lw=0.1, label=str(algo)+' runs 1-'+str(len(others)))
+                    plt.plot(x, y, c=col, lw=0.3, label=str(algo)+' runs 1-'+str(len(others)))
                 else:
-                    plt.plot(x, y, c=col, lw=0.1)
+                    plt.plot(x, y, c=col, lw=0.3)
         xms, yms, yerr = np.array(xms)/1000, np.array(yms), np.array(yerr)
         if errBar:
             plt.errorbar(xms, yms, yerr=yerr, c=cols.pop(0), lw=0.5, label=algo)
-        else:
-            plt.plot(xms, yms, yerr, cols.pop(0), lw=0.5, label=algo+' average')
+        # else:
+        #     plt.plot(xms, yms, yerr, cols.pop(0), lw=0.5, label=algo+' average')
 
     plt.plot([0, 40], [OPTIMAL_SCORE, OPTIMAL_SCORE], c='g', lw=0.5, label='Optimal')
 
@@ -204,8 +205,8 @@ def zoomedPlot(data, osogami=True, all_runs=True, errBar=True, fname="zoomedLear
 
     plt.ylim([-1.05,-0.55])
     plt.xlim([0, 40])
-    plt.legend()
-    plt.title('Determinantal algorithms on the blocker task')
+    plt.legend(loc='upper left')
+    # plt.title('Determinantal algorithms on the blocker task')
     plt.xlabel('Number of actions taken $\\times$ 1000')
     plt.ylabel('Average reward per action')
     plt.savefig('plots/'+fname, dpi=400)
@@ -231,14 +232,17 @@ if __name__ == '__main__':
 
     simulate(repeats, env, to_simulate)
 
-    data = {}
-    data = {'DetSARSA':(path1, PALATINATE), 'SARSA':(path2, 'c'),
-            'DetQ-learning':(path3, 'r'), 'Q-learning':(path4, 'b')}
-    plotMultiple(data, fn='algorithm_comparison')
+    # data = {}
+    # data = {'DetSARSA':(path1, PALATINATE), 'SARSA':(path2, 'c'),
+    #         'DetQ-learning':(path3, 'r'), 'Q-learning':(path4, 'b')}
+    # plotMultiple(data, fn='algorithm_comparison')
 
-    data = {'DetSARSA':path1, 'DetQ-learning':path3}#, 'DetSARSA-variant':path5}
-    zoomedPlot(data, all_runs=False)
-
+    # data = {'DetSARSA':path1, 'DetQ-learning':path3}#, 'DetSARSA-variant':path5}
+    # zoomedPlot(data, all_runs=False)
+    data = {'DetSARSA-Alternate':path5}
+    zoomedPlot(data, all_runs=True, errBar=False, fname='AlternateForm')
+    data = {'DetSARSA-Mine':path1}
+    zoomedPlot(data, all_runs=True, errBar=False, fname='MyForm')
 
 
 

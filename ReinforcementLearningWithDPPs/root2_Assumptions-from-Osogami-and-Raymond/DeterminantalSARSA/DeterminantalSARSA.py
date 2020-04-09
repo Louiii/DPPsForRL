@@ -10,7 +10,7 @@ from numpy.linalg import det, pinv, multi_dot as dot
 
 
 import sys
-sys.path.append('../../')
+sys.path.append('../')
 from Environments.BlockingTask import *
 
 from PrintState import maze_record, makeGIF, plotQuality, plotSimilarity
