@@ -4,10 +4,11 @@
 ##### Masters Dissertation Repository
 
 ### Determinantal SARSA
-<img src="ReinforcementLearningWithDPPs/root1_Correct-Assumptions/plots/DetSARSA-Blocker.gif" width="600"/>
-Quality           |  Similarity |  Learning Curve
+<img src="ReinforcementLearningWithDPPs/root1_Correct-Assumptions/plots/DetSARSA-Blocker.gif" width="400"/>
+
+Quality           |  Similarity        |  Learning Curve
 :-------------------------:|:-------------------------:|:-------------------------:
-<img src="ReinforcementLearningWithDPPs/root1_Correct-Assumptions/DeterminantalSARSA/hidden_state/beta0=10,betaf=50k,etastart=50k/changing-quality.gif" width="280"/> | <img src="ReinforcementLearningWithDPPs/root1_Correct-Assumptions/DeterminantalSARSA/hidden_state/beta0=10,betaf=50k,etastart=50k/changing-similarity.gif" width="280"/> | <img src="ReinforcementLearningWithDPPs/root1_Correct-Assumptions/DeterminantalSARSA/hidden_state/beta0=10,betaf=50k,etastart=50k/hess_comparison_model2.png" width="280"/>
+<img src="ReinforcementLearningWithDPPs/root1_Correct-Assumptions/DeterminantalSARSA/hidden_state/ModelMine/beta0=10,betaf=50k,etastart=50k/changing-quality.gif" width="250"/> | <img src="ReinforcementLearningWithDPPs/root1_Correct-Assumptions/DeterminantalSARSA/hidden_state/ModelMine/beta0=10,betaf=50k,etastart=50k/changing-similarity.gif" width="280"/> | <img src="ReinforcementLearningWithDPPs/root1_Correct-Assumptions/DeterminantalSARSA/hidden_state/ModelMine/beta0=10,betaf=50k,etastart=50k/hess_comparison_model2.png" width="250"/>
 
 ## Hierarchy
 ```
