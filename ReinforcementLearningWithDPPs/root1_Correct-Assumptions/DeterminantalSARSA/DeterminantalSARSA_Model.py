@@ -12,7 +12,7 @@ from numpy.linalg import det, pinv, multi_dot as dot
 import sys
 sys.path.append('../')
 from Models.Table import Table_model
-from Models.NN import NN_model
+from Models.NN_for_agent import NN_model
 from Environments.BlockingTask import *
 
 from PrintState import maze_record, makeGIF, plotQuality, plotSimilarity
