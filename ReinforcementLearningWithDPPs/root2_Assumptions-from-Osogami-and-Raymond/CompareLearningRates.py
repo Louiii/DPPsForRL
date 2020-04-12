@@ -233,9 +233,9 @@ if __name__ == '__main__':
     simulate(repeats, env, to_simulate)
 
     # data = {}
-    # data = {'DetSARSA':(path1, PALATINATE), 'SARSA':(path2, 'c'),
-    #         'DetQ-learning':(path3, 'r'), 'Q-learning':(path4, 'b')}
-    # plotMultiple(data, fn='algorithm_comparison')
+    data = {'DetSARSA':(path1, PALATINATE), 'SARSA':(path2, 'c'),
+            'DetQ-learning':(path3, 'r'), 'Q-learning':(path4, 'b')}
+    plotMultiple(data, fn='algorithm_comparison')
 
     # data = {'DetSARSA':path1, 'DetQ-learning':path3}#, 'DetSARSA-variant':path5}
     # zoomedPlot(data, all_runs=False)
