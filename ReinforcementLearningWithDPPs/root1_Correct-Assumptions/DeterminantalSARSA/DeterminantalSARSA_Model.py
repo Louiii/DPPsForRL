@@ -208,7 +208,7 @@ class DetSARSA_Model:
             # V update
 #            print(self.α)
 #            self.λ *= 0.9999
-            self.V_wr( x, self.η * TD * grad_Q )# - (V_x - self.ei_s(x)) * η * self.λ )
+            self.V_wr( x, self.η * TD * grad_Q )# - (V_x - self.ei_s(x)) * η * self.λ )# regularisation
             
 #            self.α += η * TD# grad_α = 1
             

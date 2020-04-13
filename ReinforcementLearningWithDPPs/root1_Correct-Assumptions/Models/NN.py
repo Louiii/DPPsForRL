@@ -165,9 +165,9 @@ if __name__=="__main__":
     model.batch_y = Y
 
     ac_time = []
-
+    epochs  = []
     n_check = 400
-    def check_acc(idxs=np.random.randint(0,n,n_check)):
+    def check_acc(ep, idxs=np.random.randint(0,n,n_check)):
         count = 0
         for i in idxs:
             [s, a, ns, r] = data[i]
@@ -179,17 +179,18 @@ if __name__=="__main__":
                 count+=1
         acc = count/n_check
         ac_time.append(acc)
+        epochs.append(ep)
         print('\nACC: '+str(acc))
 
-
-    for i in tqdm(range(1000)):
+    n_epochs = 1000
+    for i in tqdm(range(n_epochs)):
         model.train()
         if i%50==0:
             model.save()
-            check_acc()
+            check_acc(i)
             
     import matplotlib.pyplot as plt
-    plt.plot(ac_time, c="#72246C")
+    plt.plot(epochs, ac_time, c="#72246C")
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy (%)')
     plt.savefig('../plots/nn_training', dpi=300)
@@ -199,7 +200,7 @@ if __name__=="__main__":
 ################           test on unseen examples:            ################
 ###############################################################################         
     
-    print( check_acc(idxs=list(test_ixs)) )
+    print(check_acc(n_epochs, idxs=list(test_ixs)) )
     
             
 #    model = NN_model()
