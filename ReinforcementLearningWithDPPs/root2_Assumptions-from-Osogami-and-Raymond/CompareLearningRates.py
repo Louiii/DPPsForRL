@@ -239,9 +239,9 @@ if __name__ == '__main__':
 
     # data = {'DetSARSA':path1, 'DetQ-learning':path3}#, 'DetSARSA-variant':path5}
     # zoomedPlot(data, all_runs=False)
-    data = {'DetSARSA-Alternate':path5}
+    data = {'DetSARSA-Case 2':path5}
     zoomedPlot(data, all_runs=True, errBar=False, fname='AlternateForm')
-    data = {'DetSARSA-Mine':path1}
+    data = {'DetSARSA-Case 1':path1}
     zoomedPlot(data, all_runs=True, errBar=False, fname='MyForm')
 
 

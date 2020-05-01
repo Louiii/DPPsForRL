@@ -182,6 +182,9 @@ if __name__ == '__main__':
                      'ESARSA':(6, p+'HessSilverTeh/ESARSA-plot-data.json', 'chartreuse')}
     data = {}
     # (bi, bf, es, ec): 1: (2, 5e4, 5e4, 3e-3), 2: (20, 2e4, 4e4, 5e-4)
+    # data.update({'Det-SARSA':(1, '../root2_Assumptions-from-Osogami-and-Raymond/plots/datasets/det-sarsa-data-10runs.json', PALATINATE)})
+    # data.update(SilverHessTeh)
+    # plotMultiple(data, fn='old_comparison', mask=None)
     data.update({'MDet-SARSA 1':(1, '../HamiltonDir/data/d343.json', PALATINATE)})#{'DetSARSA-Model1':(path2, PALATINATE)})#, 'detSarsaNNModelMean':path4})
     data.update({'MDet-SARSA 2':(2, '../HamiltonDir/data/d886.json', 'r')})
     data.update(SilverHessTeh)

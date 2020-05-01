@@ -118,7 +118,6 @@ class onehotSARSA:
             state, action = next_state, next_action
             
             if done: 
-                print("YAS")
                 return t
         return epLen
         

@@ -54,7 +54,7 @@ def SGD(theta, A, m, batch_size=10, decay_start=20, alpha_0 = 1):
     return theta, grad
 
 def Adam(theta, A, n_iter, alpha=0.5, batch_size=10, beta_1=0.9, beta_2=0.999, epsilon=0.001):
-    m, v = np.zeros(len(theta))
+    m, v = np.zeros(len(theta)), np.zeros(len(theta))
     grad = []
     for t in range(1, n_iter+1):
         As = A[np.random.randint(0, len(A), batch_size)]
